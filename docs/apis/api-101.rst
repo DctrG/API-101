@@ -15,13 +15,13 @@ Note:
 
 Store your username and password as variables
 ================================================
-The export command stores the value of a varialble in memory for the duration of the CLI session
+The export command stores the value of a variable in memory for the duration of the CLI session
 
 
 .. code-block::
         :class: copy-button
 
-        $ export username=YOUR_USERNAME
+        $ export user=YOUR_USERNAME
 
 .. code-block::
         :class: copy-button
@@ -86,7 +86,7 @@ Next, retrieve information about the firewall system. This too is an operational
 
 Create a security rule
 ====================================
-Automating configuration tasks is where things get more interesting...
+Automating configuration tasks is where things get interesting. The type of API call is ``type=config``, and the action is ``set``.
 
 
 .. code-block::
@@ -156,7 +156,14 @@ A frequent use case is to register user-to-IP mappings. The first task here, ano
 
 .. code-block::
 
-        <response status="success"><result></result></response>
+        <response status="success"><result><uid-response>
+          <version>2.0</version>
+          <payload>
+            <login>
+            </login>
+          </payload>
+        </uid-response>
+        </result></response>
 
 The next API call registers a username to an IP address. This uses ``type=user-id``. Note we pass in the username, the IP address they are currently using, and a timeout value (in seconds).
 
@@ -164,7 +171,7 @@ The next API call registers a username to an IP address. This uses ``type=user-i
         :class: copy-button
         
 
-        $ curl -ksd "type=user-id&cmd=<uid-message><version>2.0</version><type>update</type><payload><login><entry name=\"NewUser\" ip=\"10.50.100.9\" timeout=\"120\"/></login></payload></uid-message>&key=$key" https://$host/api -w "\n"
+        $ curl -ksd "type=user-id&cmd=<uid-message><version>2.0</version><type>update</type><payload><login><entry name=\"$user\" ip=\"10.50.100.9\" timeout=\"120\"/></login></payload></uid-message>&key=$key" https://$host/api -w "\n"
 
 Replaying the API call to show the mapping table should now display the new user
 
