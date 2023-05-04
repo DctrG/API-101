@@ -21,7 +21,7 @@ The export command stores the value of a varialble in memory for the duration of
 .. code-block::
         :class: copy-button
 
-        $ export user=YOUR_USERNAME
+        $ export username=YOUR_USERNAME
 
 .. code-block::
         :class: copy-button
