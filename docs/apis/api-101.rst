@@ -10,60 +10,47 @@ Note:
     * Lookout for text in uppercase, such as ``YOUR_FIREWALL_IP``, and replace the text with the relevant value for your environment.
     * Commands you could/should execute are denoted with ``$`` at the start, and have copy buttons; other text boxes show expected outputs.
     * You may wish to have a text editor open on your machine, to amend copied commands before pasting them into the host's CLI.
+    * If your SSH session to the Linux host gets disconnected, you'll need to add the environment variables again for some commands to work
+
+
+Store your username and password as variables
+================================================
+The export command stores the value of a varialble in memory for the duration of the CLI session
+
+
+.. code-block::
+        :class: copy-button
+
+        $ export user=YOUR_USERNAME
+
+.. code-block::
+        :class: copy-button
+
+        $ export password=YOUR_PASSWORD
 
 
 Store our firewall's IP as a variable
-================================================
-First, to make our lives easier, we will assign the management IP address of the firewall to a variable, so we can easily refer to it in our API calls.
+========================================
+To make our lives easier, we will assign the management IP address of the firewall to the variable ``host``, so we can easily refer to it in our API calls.
 
-Today, in this environment, we will assign the API key value to a variable called ``host``, to be used in future API calls. The export command stores the value of ``host`` in memory for the duration of the CLI session.
 
 .. code-block::
         :class: copy-button
         
-        $ export host='YOUR_FIREWALL_IP'
+        $ export host=YOUR_FIREWALL_IP
 
 
-Generate your API key
-========================
+Generate your API key and store it
+====================================
 Before you can make any API calls, you need to generate an API key. Your API key will allow you to authenticate and authorise yourself for future API calls.
 
-.. code-block::
-        :class: copy-button
+In production environments, credentials should be stored, accessed and used securely, per the security policy and compliance requirements. Today, in this environment, we will assign the API key value to a variable to be used in future API calls.
 
-        $ curl -ksd 'type=keygen&user=YOUR_USERNAME&password=YOUR_PASSWORD' https://$host/api -w "\n" | xmllint --format -
-
-.. code-block::
-
-        <?xml version="1.0"?>
-        <response status="success">
-          <result>
-            <key>LUFRPT1La2VSQm1DNGowWG41R3RnNEljdXJORVJnL009M29CUERlWmNnQm1FRDBncjFHMDIrQVpJNnVLMDlJMW9UMmp4bkFEQ3BVVktpVllZT3NiS1k3L0lKQ0pybFA0Mw==</key>
-          </result>
-        </response>
-
-        <response status = 'success'><result><key>LUFRPT16V1ZzaHNFYVJEdlZnb3Buc1dJRWtCVFFPYjFXTzI2N1phVzRsMg==</key></result></response>
-
-In production environments, credentials should be stored, accessed and used securely, per the security policy and compliance requirements. Today, in this environment, we will assign the API key value to a variable to be used in future API calls. Take the characters between the ``key`` tags from the previous output as your API key, in the example above this is the characters from ``LUFRPT16...`` to ``...Mg==``
 
 .. code-block::
         :class: copy-button
 
-        $ export key='YOUR_API_KEY'
-
-For example:
-
-.. code-block::
-        :class: copy-button
-
-        $ export key='LUFRPT16V1ZzaHNFYVJEdlZnb3Buc1dJRWtCVFFPYjFXTzI2N1phVzRsMg=='
-
-Or you could do it all in one command:
-
-.. code-block::
-        :class: copy-button
-
-        $ export key=`curl -ksd 'type=keygen&user=YOUR_USERNAME&password=YOUR_PASSWORD' https://$host/api | xmllint --xpath "/response/result/key/text()" -`; echo $key
+        $ export key=`curl -ksd 'type=keygen&user=$user&password=$password' https://$host/api | xmllint --xpath "/response/result/key/text()" -`; echo $key
 
 .. code-block::
 
@@ -105,6 +92,18 @@ Another useful operational command is to display the routing table.
         
 
         $ curl -ksd "type=op&cmd=<show><routing><route></route></routing></show>&key=$key" https://$host/api -w "\n" | xmllint --format -
+
+
+Create a security rule
+====================================
+Automating configuration tasks is where things get more interesting...
+
+
+.. code-block::
+        :class: copy-button
+
+        $ curl -ksd "type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='$username']&element=<to><member>untrust</member></to><from><member>trust</member></from><source><member>any</member></source><destination><member>any</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>web-browsing</member></application><service><member>application-default</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action>&key=$key" https://$host/api -w "\n" | xmllint --format -
+
 
 Show the rulebase configuration
 ====================================
