@@ -94,6 +94,15 @@ Automating configuration tasks is where things get more interesting...
 
         $ curl -ksd "type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='$user']&element=<to><member>untrust</member></to><from><member>trust</member></from><source><member>any</member></source><destination><member>any</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>web-browsing</member></application><service><member>application-default</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action>&key=$key" https://$host/api -w "\n" | xmllint --format -
 
+Disable a security rule
+=========================
+Let's disable the rule we just created.
+
+.. code-block::
+        :class: copy-button
+
+        $ curl -ksd "type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='$user']&element=<disabled>yes</disabled>&key=$key" https://$host/api -w "\n" | xmllint --format -
+
 
 Show the rulebase configuration
 ====================================
