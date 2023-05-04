@@ -50,7 +50,7 @@ In production environments, credentials should be stored, accessed and used secu
 .. code-block::
         :class: copy-button
 
-        $ export key=`curl -ksd 'type=keygen&user=$user&password=$password' https://$host/api | xmllint --xpath "/response/result/key/text()" -`; echo $key
+        $ export key=`curl -ksd "type=keygen&user=$user&password=$password" https://$host/api -w "\n" | xmllint --xpath "/response/result/key/text()" -`; echo $key
 
 .. code-block::
 
@@ -83,16 +83,6 @@ Next, retrieve information about the firewall system. This too is an operational
 
         $ curl -ksd "type=op&cmd=<show><system><info></info></system></show>&key=$key" https://$host/api -w "\n" | xmllint --format -
 
-Show the routing table
-====================================
-Another useful operational command is to display the routing table.
-
-.. code-block::
-        :class: copy-button
-        
-
-        $ curl -ksd "type=op&cmd=<show><routing><route></route></routing></show>&key=$key" https://$host/api -w "\n" | xmllint --format -
-
 
 Create a security rule
 ====================================
@@ -102,7 +92,7 @@ Automating configuration tasks is where things get more interesting...
 .. code-block::
         :class: copy-button
 
-        $ curl -ksd "type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='$username']&element=<to><member>untrust</member></to><from><member>trust</member></from><source><member>any</member></source><destination><member>any</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>web-browsing</member></application><service><member>application-default</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action>&key=$key" https://$host/api -w "\n" | xmllint --format -
+        $ curl -ksd "type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='$user']&element=<to><member>untrust</member></to><from><member>trust</member></from><source><member>any</member></source><destination><member>any</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>web-browsing</member></application><service><member>application-default</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action>&key=$key" https://$host/api -w "\n" | xmllint --format -
 
 
 Show the rulebase configuration
